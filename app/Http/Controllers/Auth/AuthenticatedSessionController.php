@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\Wallet;
+use Illuminate\Support\Str;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -28,7 +30,22 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if (Auth::check() && !Auth::user()->wallet) {
+            Wallet::create([
+                'user_id' => Auth::id(),
+                'wallet_id' => Str::uuid(),
+                'type' => 'main',
+                'balance' => 0,
+            ]);
+        }
+
+        // Get currency order count for the logged-in user
+    $orderCount = \App\Models\CurrencyOrder::where('user_id', Auth::id())->count();
+
+    // Store it in session to use later in your dashboard
+    session(['orderCount' => $orderCount]);
+
+        return redirect()->intended(route('userdash', absolute: false));
     }
 
     /**

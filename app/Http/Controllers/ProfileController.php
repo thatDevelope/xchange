@@ -57,4 +57,14 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+
+    
+    public function edie(Request $request): View
+    {
+        return view('userdashboard.profile', [
+            'user' => Auth::user(),
+            
+        ]);
+    }
 }

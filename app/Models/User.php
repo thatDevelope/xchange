@@ -54,4 +54,34 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    public function wallet()
+{
+    return $this->hasOne(Wallet::class);
+}
+
+
+// app/Models/User.php
+
+public function cryptoWallet()
+{
+    return $this->hasOne(CryptoWallet::class);
+}
+
+public function sentMessages()
+{
+    return $this->hasMany(Message::class, 'sender_id');
+}
+
+public function receivedMessages()
+{
+    return $this->hasMany(Message::class, 'receiver_id');
+}
+
+public function currencyOrders()
+{
+    return $this->hasMany(\App\Models\CurrencyOrder::class);
+}
+
+
 }

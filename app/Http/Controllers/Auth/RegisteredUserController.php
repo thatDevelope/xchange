@@ -13,6 +13,8 @@ use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 use Rinvex\Country\CountryLoader;
+use App\Models\Wallet;
+use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
@@ -78,6 +80,14 @@ class RegisteredUserController extends Controller
                 'country' => $request->country, // Store country
                 
             ]);
+
+
+            Wallet::create([
+                'user_id' => $user->id,  // Link the wallet to the user by user_id
+                'wallet_id' => Str::uuid(), // Generate a unique wallet ID using UUID
+                'type' => 'main', // Default wallet type (you can have other types like 'savings', 'main', etc.)
+                'balance' => 0, // Start with a balance of 0
+            ]);
     
             // Fire the registered event
             event(new Registered($user));
@@ -88,7 +98,7 @@ class RegisteredUserController extends Controller
             // Log success message
             Log::info('User successfully registered', ['user_id' => $user->id]);
     
-            return redirect(route('dashboard', absolute: false));
+            return redirect(route('userdash', absolute: false));
         } catch (\Exception $e) {
             // Log the error message
             Log::error('Error during user registration', ['error' => $e->getMessage()]);
@@ -96,4 +106,6 @@ class RegisteredUserController extends Controller
             return back()->withErrors(['message' => 'An error occurred during registration. Please try again.']);
         }
     }
+
+    
 }
